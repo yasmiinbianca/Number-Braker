@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NumCrush - Destruidor de Números</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen active">
+        <div class="start-content">
+            <h1 class="game-title">
+                <span class="title-num">N</span><span class="title-num">U</span><span class="title-num">M</span>
+                <br>
+                <span class="title-num accent">C</span><span class="title-num accent">R</span><span class="title-num accent">U</span><span class="title-num accent">S</span><span class="title-num accent">H</span>
+            </h1>
+            <p class="subtitle">Destruidor de Números</p>
+            <button id="btnPlay" class="btn btn-primary btn-large pulse-anim">▶ JOGAR</button>
+            <button id="btnRanking" class="btn btn-secondary">🏆 Ranking</button>
+            <button id="btnAchievements" class="btn btn-secondary">🎖️ Conquistas</button>
+            <div class="start-stats">
+                <span id="startBestScore">Melhor: 0</span>
+                <span id="startLevel">Nível: 1</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <!-- Top HUD -->
+        <div id="topHud">
+            <div class="hud-row">
+                <div class="hud-item">
+                    <span class="hud-icon">⭐</span>
+                    <span id="scoreDisplay" class="hud-value">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-icon">🪙</span>
+                    <span id="coinDisplay" class="hud-value">0</span>
+                </div>
+                <div class="hud-item phase-display">
+                    <span class="hud-icon">📊</span>
+                    <span>Fase </span><span id="phaseDisplay">1</span>
+                </div>
+                <button id="btnPause" class="btn-icon" title="Pausar">⏸</button>
+            </div>
+            <div class="xp-bar-container">
+                <div id="xpBar" class="xp-bar"></div>
+                <span id="levelDisplay" class="xp-label">Nv. 1</span>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Bottom HUD -->
+        <div id="bottomHud">
+            <div class="powerup-bar">
+                <button class="powerup-btn" data-power="bomb" id="pwBomb" title="Bomba">
+                    <span class="pw-icon">💣</span>
+                    <span class="pw-count" id="pwBombCount">0</span>
+                </button>
+                <button class="powerup-btn" data-power="half" id="pwHalf" title="Metade">
+                    <span class="pw-icon">½</span>
+                    <span class="pw-count" id="pwHalfCount">0</span>
+                </button>
+                <button class="powerup-btn" data-power="ray" id="pwRay" title="Raio">
+                    <span class="pw-icon">⚡</span>
+                    <span class="pw-count" id="pwRayCount">0</span>
+                </button>
+                <button class="powerup-btn" data-power="freeze" id="pwFreeze" title="Congelamento">
+                    <span class="pw-icon">❄️</span>
+                    <span class="pw-count" id="pwFreezeCount">0</span>
+                </button>
+            </div>
+            <div class="shooter-info">
+                <div class="next-square-label">Próximo:</div>
+                <div id="nextSquarePreview" class="square-preview">
+                    <span id="nextSquareValue">?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combo Display -->
+        <div id="comboDisplay" class="combo-display hidden">
+            <span id="comboText">COMBO x2!</span>
+        </div>
+
+        <!-- Freeze Overlay -->
+        <div id="freezeOverlay" class="freeze-overlay hidden">
+            <span>❄️ CONGELADO ❄️</span>
+        </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pauseModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>⏸ Pausado</h2>
+            <button id="btnResume" class="btn btn-primary">▶ Continuar</button>
+            <button id="btnShop" class="btn btn-accent">🛒 Loja</button>
+            <button id="btnQuit" class="btn btn-danger">🚪 Sair</button>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shopModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <h2>🛒 Loja de Melhorias</h2>
+            <div class="shop-coins">
+                <span>🪙</span> <span id="shopCoins">0</span>
+            </div>
+            <div id="shopItems" class="shop-grid"></div>
+            <button id="btnCloseShop" class="btn btn-secondary">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Phase Complete Modal -->
+    <div id="phaseCompleteModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎉 Fase Completa!</h2>
+            <div class="phase-stats">
+                <p>Pontuação: <span id="phaseScore">0</span></p>
+                <p>Moedas ganhas: <span id="phaseCoins">0</span></p>
+                <p>Quadrados destruídos: <span id="phaseDestroyed">0</span></p>
+            </div>
+            <button id="btnNextPhase" class="btn btn-primary btn-large pulse-anim">Próxima Fase ▶</button>
+            <button id="btnPhaseShop" class="btn btn-accent">🛒 Loja</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>💀 Fim de Jogo</h2>
+            <div class="phase-stats">
+                <p>Pontuação Final: <span id="finalScore">0</span></p>
+                <p>Fase Alcançada: <span id="finalPhase">1</span></p>
+                <p>Moedas Totais: <span id="finalCoins">0</span></p>
+            </div>
+            <div id="newHighScore" class="hidden high-score-banner">🏆 NOVA MELHOR PONTUAÇÃO! 🏆</div>
+            <button id="btnRestart" class="btn btn-primary btn-large">🔄 Jogar Novamente</button>
+            <button id="btnGameOverMenu" class="btn btn-secondary">🏠 Menu</button>
+        </div>
+    </div>
+
+    <!-- Ranking Modal -->
+    <div id="rankingModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <h2>🏆 Ranking Local</h2>
+            <div id="rankingList" class="ranking-list"></div>
+            <button id="btnCloseRanking" class="btn btn-secondary">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <h2>🎖️ Conquistas</h2>
+            <div id="achievementsList" class="achievements-list"></div>
+            <button id="btnCloseAchievements" class="btn btn-secondary">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div id="achievementNotif" class="achievement-notif hidden">
+        <span class="notif-icon">🎖️</span>
+        <div class="notif-text">
+            <strong>Conquista Desbloqueada!</strong>
+            <span id="achievementNotifText"></span>
+        </div>
+    </div>
+
+    <!-- Level Up Notification -->
+    <div id="levelUpNotif" class="level-up-notif hidden">
+        <span>⬆️ NÍVEL <span id="levelUpValue">2</span>!</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
